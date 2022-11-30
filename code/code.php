@@ -130,14 +130,85 @@ if(isset($_GET['request_id']))
 
 //-------------------to change request status--------------------//
 
-$request_id = mysqli_real_escape_string($con, $_GET['r_id']);
-$request_status = mysqli_real_escape_string($con, $_GET['request_status']);
-$updatequery1 = "UPDATE support SET request_status=$request_status WHERE r_id=$request_id";
-mysqli_query($con,$updatequery1);
-header('location:support.php');
+// $request_id = mysqli_real_escape_string($con, $_GET['r_id']);
+// $request_status = mysqli_real_escape_string($con, $_GET['request_status']);
+// $updatequery1 = "UPDATE support SET request_status=$request_status WHERE r_id=$request_id";
+// mysqli_query($con,$updatequery1);
+// header('location:support.php');
 
 //==========================================//
 
+
+//-------------------get department users--------------------//
+if(isset($_GET['get_users'])){
+    $request_id = mysqli_real_escape_string($con, $_GET['dep_id']);
+
+    $query = "SELECT `user_id`,`name` FROM users WHERE department_id=".$_GET['dep_id']." and user_status=1";
+    $query_run = mysqli_query($con, $query);
+  
+    $request = mysqli_fetch_all($query_run,MYSQLI_NUM);
+
+    if(mysqli_num_rows($query_run)>0)
+    {
+        // $request = mysqli_fetch_array($query_run);
+        $res = [
+            'status' => 200,
+            'message' => 'Request Fetch Successfully by department id',
+            'data' => $request,
+        ];
+        echo json_encode($res);
+         return;
+    }
+    else
+    {
+        $res = [
+            'status' => 404,
+            'message' => 'Request No Users In Requested Department Id '
+        ];
+        echo json_encode($res);
+         return;
+    }
+}
+
+//==========================================//
+
+
+
+//-------------------get department groups--------------------//
+if(isset($_GET['get_groups'])){
+    $request_id = mysqli_real_escape_string($con, $_GET['dep_id']);
+
+    $query = "SELECT `group_id`,`group_name` FROM groups WHERE department_id=".$_GET['dep_id']." and group_status=1";
+    $query_run = mysqli_query($con, $query);
+  
+
+ if(@mysqli_num_rows($query_run)>0)
+    {
+        $request = mysqli_fetch_all($query_run,MYSQLI_NUM);
+
+         $res = [
+            'status' => 200,
+            'message' => 'Request Fetch Successfully by department id',
+            'data' => $request,
+        ];
+        echo json_encode($res);
+         return;
+    }
+    else
+    {
+        $res = [
+            'status' => 404,
+            'message' => 'Request No Groups In Requested Department Id '
+        ];
+        echo json_encode($res);
+         return;
+    }
+}
+
+//==========================================//
 ?>
+
+
+
 
 

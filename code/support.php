@@ -69,15 +69,14 @@
                             </div>
                             <div class="mb-3">
                                 <label for="">Group</label>
-                                <select class="form-select"  name="" id="">
-                                    <option selected="" disabled="" value="" >select department first</option>   
+                                <select class="form-select"  name="group_id" id="group_id" disabled>
                                 </select>
                                 
                             </div>
                             <!-- OR -->
                             <div class="mb-3">
-                                <label for="">User</label>
-                                <select class="form-select"  name="" id="">
+                                <label for="">User3</label>
+                                <select class="form-select"  name="user_id" id="user_id" disabled>
                                     <option selected="" disabled="" value="" >select department first</option> 
                                 </select> 
                             </div>
@@ -89,6 +88,7 @@
                                     <option value="urgent">urgent</option>
                                 </select>
                             </div>
+                      
                             <div class="mb-3">
                                 <label for="">Duration</label>
                                 <div class="time-input" >
@@ -181,7 +181,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="">Group</label>
-                                <select class="form-select"  name="" id="">
+                                <select class="form-select"  name="" id="group_id" disabled>
                                     <option selected="" disabled="" value="" >select department first</option>   
                                 </select>
                                 
@@ -388,7 +388,7 @@
                                 $query = "SELECT * FROM support";
                                 $query_run = mysqli_query($con, $query);
 
-                                if(mysqli_num_rows($query_run) > 0)
+                                if(@mysqli_num_rows($query_run) > 0)
                                 {
                                     foreach($query_run as $request)
                                     {
@@ -559,7 +559,75 @@
             });
 
             // end update data
-        </script>
+
+$(document).ready(function(){
+
+    $('#department_id').change(function(e){
+    e.preventDefault();
+    var dep = e.target.value;
+    // alert(e.target.value)
+   $('#group_id').prop("disabled",false); 
+   $('#user_id').prop("disabled",false); 
+   get_department_users(dep);
+    get_department_groups(dep);
+})
+
+})
+function get_department_users(dep_id){
+    $('#user_id').html('')
+    $.ajax({
+                    type: "GET",
+                    contentType:'application/json',
+                    url: "code.php?get_users=1&&dep_id=" + dep_id,
+                    success: function (response) {
+                         var res = jQuery.parseJSON(response);
+                        if(res.status == 404) {
+
+                            alert(res.message);
+                            $('#user_id').prop("enabled",false); 
+                            $('#user_id').prop("disabled",true);
+                        }else if(res.status == 200){
+list_item($('#user_id'),res.data)
+                       
+                                }
+                            }
+                            });
+
+}
+
+function get_department_groups(dep_id){
+    $('#group_id').html('')
+    $.ajax({
+                    type: "GET",
+                    contentType:'application/json',
+                    url: "code.php?get_groups=1&&dep_id=" + dep_id,
+                    success: function (response) {
+                         var res = jQuery.parseJSON(response);
+                        if(res.status == 404) {
+                            alert(res.message);
+                            $('#group_id').prop("enabled",false); 
+                            $('#group_id').prop("disabled",true);
+                        }else if(res.status == 200){
+                            if(res.data.length > 0){
+
+                                list_item($('#group_id'),res.data)
+                            }
+                       
+                                }
+                            }
+                            });
+
+}
+function list_item(elem,arr){
+    elem.html('')
+    if(arr.length > 0){
+        arr.forEach(function(item){
+elem.append(new Option(item[1],item[0]))
+    }) 
+    }
+   
+}
+</script>
 
         <!-- active and disactive -->
         <script>
